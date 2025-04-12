@@ -8,6 +8,8 @@ import {
   ChartOptions
 } from 'chart.js';
 import { Box, Typography } from '@mui/material';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { formatCurrency, formatNumber, formatCompactCurrency, formatCompactNumber } from '../../utils/formatUtils';
 
 // Register ChartJS components
 ChartJS.register(
@@ -24,13 +26,14 @@ interface PieChartProps {
   isCurrency?: boolean;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ 
-  title, 
-  labels, 
-  data, 
+const PieChart: React.FC<PieChartProps> = ({
+  title,
+  labels,
+  data,
   colors,
   isCurrency = false
 }) => {
+  const { t, language } = useLanguage();
   // Default colors if not provided
   const defaultColors = [
     '#8e44ad', // Purple
@@ -47,8 +50,11 @@ const PieChart: React.FC<PieChartProps> = ({
 
   const chartColors = colors || defaultColors;
 
+  // Translate labels if they are translation keys
+  const translatedLabels = labels.map(label => t(label) || label);
+
   const chartData = {
-    labels,
+    labels: translatedLabels,
     datasets: [
       {
         data,
@@ -78,22 +84,25 @@ const PieChart: React.FC<PieChartProps> = ({
             if (label) {
               label += ': ';
             }
-            
+
             const value = context.raw as number;
+            const threshold = 10000; // 超过这个阈值使用紧凑格式
+
             if (isCurrency) {
-              label += new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD'
-              }).format(value);
+              label += Math.abs(value) >= threshold
+                ? formatCompactCurrency(value, language)
+                : formatCurrency(value, language);
             } else {
-              label += new Intl.NumberFormat('en-US').format(value);
+              label += Math.abs(value) >= threshold
+                ? formatCompactNumber(value, language)
+                : formatNumber(value, language);
             }
-            
+
             // Add percentage
             const total = data.reduce((sum, val) => sum + val, 0);
             const percentage = ((value / total) * 100).toFixed(1);
             label += ` (${percentage}%)`;
-            
+
             return label;
           }
         }
@@ -104,7 +113,7 @@ const PieChart: React.FC<PieChartProps> = ({
   return (
     <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
       <Typography variant="h6" align="center" gutterBottom>
-        {title}
+        {t(title) || title}
       </Typography>
       <Box sx={{ height: 300 }}>
         <Pie data={chartData} options={options} />

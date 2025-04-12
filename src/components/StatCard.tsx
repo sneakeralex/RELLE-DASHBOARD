@@ -3,7 +3,9 @@ import { Card, CardContent, Typography, Box, Chip, Avatar } from '@mui/material'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { StatCardProps } from '../types/statistics';
-import { formatCurrency, formatNumber, formatPercentage } from '../utils/dateUtils';
+import { formatPercentage } from '../utils/dateUtils';
+import { formatCurrency, formatNumber, formatCompactCurrency, formatCompactNumber } from '../utils/formatUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const StatCard: React.FC<StatCardProps> = ({
   title,
@@ -14,17 +16,30 @@ const StatCard: React.FC<StatCardProps> = ({
   isPercentage = false,
   isCurrency = false
 }) => {
+  const { language } = useLanguage();
+
   const formattedValue = React.useMemo(() => {
     if (typeof value === 'string') return value;
     if (isPercentage) return formatPercentage(value);
-    if (isCurrency) return formatCurrency(value);
-    return formatNumber(value);
-  }, [value, isPercentage, isCurrency]);
+
+    // 使用自适应格式化函数
+    const threshold = 10000; // 超过这个阈值使用紧凑格式
+
+    if (isCurrency) {
+      return Math.abs(value) >= threshold
+        ? formatCompactCurrency(value, language)
+        : formatCurrency(value, language);
+    }
+
+    return Math.abs(value) >= threshold
+      ? formatCompactNumber(value, language)
+      : formatNumber(value, language);
+  }, [value, isPercentage, isCurrency, language]);
 
   return (
-    <Card 
+    <Card
       className="stats-card"
-      sx={{ 
+      sx={{
         height: '100%',
         borderTop: `4px solid ${color}`,
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
@@ -44,11 +59,11 @@ const StatCard: React.FC<StatCardProps> = ({
             {title}
           </Typography>
         </Box>
-        
+
         <Typography variant="h4" component="div" fontWeight="bold" mb={1}>
           {formattedValue}
         </Typography>
-        
+
         {percentChange !== 0 && (
           <Chip
             icon={percentChange > 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}

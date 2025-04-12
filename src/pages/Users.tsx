@@ -13,7 +13,7 @@ import {
   TableRow,
   TablePagination,
   TableSortLabel,
-  Chip,
+
   IconButton,
   InputAdornment,
   Grid,
@@ -32,7 +32,8 @@ import {
 } from '@mui/icons-material';
 import { fetchUserData } from '../services/api';
 import { User } from '../types/user';
-import { formatCurrency } from '../utils/dateUtils';
+import { formatCurrency } from '../utils/formatUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -58,6 +59,7 @@ const headCells: HeadCell[] = [
 ];
 
 const UsersPage: React.FC = () => {
+  const { language } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -214,7 +216,7 @@ const UsersPage: React.FC = () => {
                 Total Spent
               </Typography>
               <Typography variant="h4">
-                {formatCurrency(totalSpent)}
+                {formatCurrency(totalSpent, language)}
               </Typography>
             </CardContent>
           </Card>
@@ -227,7 +229,7 @@ const UsersPage: React.FC = () => {
                 Average Spent
               </Typography>
               <Typography variant="h4">
-                {formatCurrency(avgSpent)}
+                {formatCurrency(avgSpent, language)}
               </Typography>
             </CardContent>
           </Card>
@@ -375,8 +377,8 @@ const UsersPage: React.FC = () => {
                       <TableCell>{user.id}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Avatar 
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} 
+                          <Avatar
+                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
                             sx={{ width: 24, height: 24, mr: 1 }}
                           />
                           {user.name}
@@ -392,7 +394,7 @@ const UsersPage: React.FC = () => {
                           : 'Never'}
                       </TableCell>
                       <TableCell align="right">
-                        {formatCurrency(user.totalSpent || 0)}
+                        {formatCurrency(user.totalSpent || 0, language)}
                       </TableCell>
                       <TableCell align="right">
                         {user.loyaltyPoints?.toLocaleString() || 0}

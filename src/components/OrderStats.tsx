@@ -9,7 +9,9 @@ import LineChart from './Charts/LineChart';
 import BarChart from './Charts/BarChart';
 import { OrderStats as OrderStatsType } from '../types/order';
 import { RecentOrder, TrendData } from '../types/statistics';
-import { formatDate, formatCurrency } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils';
+import { formatCurrency, formatCompactCurrency } from '../utils/formatUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface OrderStatsProps {
   orderStats: OrderStatsType;
@@ -18,12 +20,14 @@ interface OrderStatsProps {
   revenueTrend: TrendData[];
 }
 
-const OrderStats: React.FC<OrderStatsProps> = ({ 
-  orderStats, 
-  recentOrders, 
+const OrderStats: React.FC<OrderStatsProps> = ({
+  orderStats,
+  recentOrders,
   orderTrend,
   revenueTrend
 }) => {
+  const { language } = useLanguage();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -42,7 +46,7 @@ const OrderStats: React.FC<OrderStatsProps> = ({
       <Typography variant="h5" sx={{ mb: 3 }}>
         Order Statistics
       </Typography>
-      
+
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
@@ -53,7 +57,7 @@ const OrderStats: React.FC<OrderStatsProps> = ({
             percentChange={orderStats.orderGrowthRate}
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Revenue"
@@ -63,7 +67,7 @@ const OrderStats: React.FC<OrderStatsProps> = ({
             isCurrency={true}
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Orders This Week"
@@ -72,7 +76,7 @@ const OrderStats: React.FC<OrderStatsProps> = ({
             color="#3498db"
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Average Order Value"
@@ -83,35 +87,35 @@ const OrderStats: React.FC<OrderStatsProps> = ({
           />
         </Grid>
       </Grid>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
               Order Trend
             </Typography>
-            <LineChart 
-              title="Orders Over Time" 
-              data={orderTrend} 
-              color="#e74c3c" 
+            <LineChart
+              title="Orders Over Time"
+              data={orderTrend}
+              color="#e74c3c"
             />
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
               Revenue Trend
             </Typography>
-            <LineChart 
-              title="Revenue Over Time" 
-              data={revenueTrend} 
+            <LineChart
+              title="Revenue Over Time"
+              data={revenueTrend}
               color="#2ecc71"
               isCurrency={true}
             />
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
@@ -132,10 +136,14 @@ const OrderStats: React.FC<OrderStatsProps> = ({
                     <TableRow key={order.id}>
                       <TableCell>{order.customerName}</TableCell>
                       <TableCell>{formatDate(order.orderDate, 'MMM dd')}</TableCell>
-                      <TableCell align="right">{formatCurrency(order.totalAmount)}</TableCell>
                       <TableCell align="right">
-                        <Chip 
-                          label={order.status} 
+                        {order.totalAmount >= 10000
+                          ? formatCompactCurrency(order.totalAmount, language)
+                          : formatCurrency(order.totalAmount, language)}
+                      </TableCell>
+                      <TableCell align="right">
+                        <Chip
+                          label={order.status}
                           color={getStatusColor(order.status) as "success" | "warning" | "error" | "default"}
                           size="small"
                         />
@@ -147,7 +155,7 @@ const OrderStats: React.FC<OrderStatsProps> = ({
             </TableContainer>
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>

@@ -7,7 +7,9 @@ import StatCard from './StatCard';
 import LineChart from './Charts/LineChart';
 import { UserStats as UserStatsType } from '../types/user';
 import { RecentUser, TrendData } from '../types/statistics';
-import { formatDate, formatCurrency } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils';
+import { formatCurrency, formatCompactCurrency } from '../utils/formatUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface UserStatsProps {
   userStats: UserStatsType;
@@ -16,12 +18,13 @@ interface UserStatsProps {
 }
 
 const UserStats: React.FC<UserStatsProps> = ({ userStats, recentUsers, userTrend }) => {
+  const { language } = useLanguage();
   return (
     <Box sx={{ mb: 4 }}>
       <Typography variant="h5" sx={{ mb: 3 }}>
         User Statistics
       </Typography>
-      
+
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
@@ -32,7 +35,7 @@ const UserStats: React.FC<UserStatsProps> = ({ userStats, recentUsers, userTrend
             percentChange={userStats.userGrowthRate}
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="New Users (Today)"
@@ -41,7 +44,7 @@ const UserStats: React.FC<UserStatsProps> = ({ userStats, recentUsers, userTrend
             color="#3498db"
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="New Users (Week)"
@@ -50,7 +53,7 @@ const UserStats: React.FC<UserStatsProps> = ({ userStats, recentUsers, userTrend
             color="#2ecc71"
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="New Users (Month)"
@@ -60,21 +63,21 @@ const UserStats: React.FC<UserStatsProps> = ({ userStats, recentUsers, userTrend
           />
         </Grid>
       </Grid>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
               User Growth Trend
             </Typography>
-            <LineChart 
-              title="New Users Over Time" 
-              data={userTrend} 
-              color="#8e44ad" 
+            <LineChart
+              title="New Users Over Time"
+              data={userTrend}
+              color="#8e44ad"
             />
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
@@ -94,7 +97,11 @@ const UserStats: React.FC<UserStatsProps> = ({ userStats, recentUsers, userTrend
                     <TableRow key={user.id}>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{formatDate(user.createdAt, 'MMM dd')}</TableCell>
-                      <TableCell align="right">{formatCurrency(user.totalSpent)}</TableCell>
+                      <TableCell align="right">
+                        {user.totalSpent >= 10000
+                          ? formatCompactCurrency(user.totalSpent, language)
+                          : formatCurrency(user.totalSpent, language)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

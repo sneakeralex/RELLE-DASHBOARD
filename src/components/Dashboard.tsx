@@ -7,23 +7,26 @@ import SimpleLineChart from './SimpleLineChart';
 import PieChart from './Charts/PieChart';
 import HeatMap from './Charts/HeatMap';
 import { useAuth } from '../contexts/AuthContext';
+import { formatCurrency, formatCompactCurrency } from '../utils/formatUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Dashboard: React.FC = () => {
   const { authState } = useAuth();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState<boolean>(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   // Mock data for service distribution
-  const [serviceData, setServiceData] = useState({
-    labels: ['Haircut', 'Coloring', 'Styling', 'Manicure', 'Pedicure', 'Facial', 'Massage', 'Waxing'],
+  const [serviceData] = useState({
+    labels: ['chart.haircut', 'chart.coloring', 'chart.styling', 'chart.manicure', 'chart.pedicure', 'chart.facial', 'chart.massage', 'chart.waxing'],
     data: [120, 85, 65, 95, 75, 55, 40, 35]
   });
 
   // Mock data for busy hours heatmap
-  const [busyHoursData, setBusyHoursData] = useState({
-    xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  const [busyHoursData] = useState({
+    xLabels: ['chart.mon', 'chart.tue', 'chart.wed', 'chart.thu', 'chart.fri', 'chart.sat', 'chart.sun'],
     yLabels: ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM'],
     data: [
       [12, 15, 8, 10, 18, 25, 5],
@@ -122,9 +125,9 @@ const Dashboard: React.FC = () => {
           textColor="primary"
           variant="fullWidth"
         >
-          <Tab label="Overview" />
-          <Tab label="Users" />
-          <Tab label="Orders" />
+          <Tab label={t('nav.dashboard')} />
+          <Tab label={t('nav.users')} />
+          <Tab label={t('nav.orders')} />
         </Tabs>
       </Paper>
 
@@ -133,17 +136,17 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12}>
             <Paper sx={{ p: 3, mb: 4 }}>
               <Typography variant="h5" gutterBottom>
-                Dashboard Overview
+                {t('dashboard.overview')}
               </Typography>
               <Typography variant="body1" paragraph>
-                Welcome to the Beauty Chain Dashboard. Here you can view key metrics for your beauty salon chain business.
+                {t('app.welcome')}
               </Typography>
 
               <Grid container spacing={3} sx={{ mt: 2 }}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f8f4fc' }}>
                     <Typography variant="h6" color="primary">
-                      Total Users
+                      {t('dashboard.totalUsers')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.userStats.totalUsers.toLocaleString()}
@@ -154,7 +157,7 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f4f8fc' }}>
                     <Typography variant="h6" color="primary">
-                      Total Orders
+                      {t('dashboard.totalOrders')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.orderStats.totalOrders.toLocaleString()}
@@ -165,10 +168,12 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f4fcf8' }}>
                     <Typography variant="h6" color="primary">
-                      Total Revenue
+                      {t('dashboard.totalRevenue')}
                     </Typography>
-                    <Typography variant="h3">
-                      ${dashboardData.orderStats.totalRevenue.toLocaleString()}
+                    <Typography variant="h3" sx={{ fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2.2rem' } }}>
+                      {dashboardData.orderStats.totalRevenue >= 10000
+                        ? formatCompactCurrency(dashboardData.orderStats.totalRevenue, language)
+                        : formatCurrency(dashboardData.orderStats.totalRevenue, language)}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -176,10 +181,12 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#fcf4f8' }}>
                     <Typography variant="h6" color="primary">
-                      Avg. Order Value
+                      {t('dashboard.avgOrderValue')}
                     </Typography>
-                    <Typography variant="h3">
-                      ${dashboardData.orderStats.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <Typography variant="h3" sx={{ fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2.2rem' } }}>
+                      {dashboardData.orderStats.averageOrderValue >= 10000
+                        ? formatCompactCurrency(dashboardData.orderStats.averageOrderValue, language)
+                        : formatCurrency(dashboardData.orderStats.averageOrderValue, language)}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -190,11 +197,11 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                User Growth Trend
+                {t('dashboard.userGrowth')}
               </Typography>
               <SimpleLineChart
                 data={dashboardData.userTrend}
-                title="New Users Over Time"
+                title="chart.newUsers"
                 color="#8e44ad"
               />
             </Paper>
@@ -203,11 +210,11 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Revenue Trend
+                {t('dashboard.revenueTrend')}
               </Typography>
               <SimpleLineChart
                 data={dashboardData.revenueTrend}
-                title="Revenue Over Time"
+                title="chart.revenue"
                 color="#2ecc71"
                 isCurrency={true}
               />
@@ -217,10 +224,10 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Service Distribution
+                {t('dashboard.serviceDistribution')}
               </Typography>
               <PieChart
-                title="Popular Services"
+                title="dashboard.popularServices"
                 labels={serviceData.labels}
                 data={serviceData.data}
               />
@@ -230,10 +237,10 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Busy Hours by Day
+                {t('dashboard.busyHours')}
               </Typography>
               <HeatMap
-                title="Customer Traffic"
+                title="dashboard.customerTraffic"
                 data={busyHoursData.data}
                 xLabels={busyHoursData.xLabels}
                 yLabels={busyHoursData.yLabels}
@@ -244,16 +251,16 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Recent Users
+                {t('dashboard.recentUsers')}
               </Typography>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Joined</TableCell>
-                      <TableCell align="right">Spent</TableCell>
+                      <TableCell>{t('users.name')}</TableCell>
+                      <TableCell>{t('users.email')}</TableCell>
+                      <TableCell>{t('users.joined')}</TableCell>
+                      <TableCell align="right">{t('users.spent')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -262,7 +269,7 @@ const Dashboard: React.FC = () => {
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell align="right">${user.totalSpent.toLocaleString()}</TableCell>
+                        <TableCell align="right">{formatCurrency(user.totalSpent, language)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -274,16 +281,16 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Recent Orders
+                {t('dashboard.recentOrders')}
               </Typography>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Customer</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell align="right">Amount</TableCell>
-                      <TableCell align="right">Status</TableCell>
+                      <TableCell>{t('orders.customer')}</TableCell>
+                      <TableCell>{t('orders.date')}</TableCell>
+                      <TableCell align="right">{t('orders.amount')}</TableCell>
+                      <TableCell align="right">{t('orders.status')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -291,7 +298,7 @@ const Dashboard: React.FC = () => {
                       <TableRow key={order.id}>
                         <TableCell>{order.customerName}</TableCell>
                         <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                        <TableCell align="right">${order.totalAmount.toLocaleString()}</TableCell>
+                        <TableCell align="right">{formatCurrency(order.totalAmount, language)}</TableCell>
                         <TableCell align="right">
                           <Chip
                             label={order.status}
@@ -314,10 +321,10 @@ const Dashboard: React.FC = () => {
             <Grid item xs={12}>
               <Paper sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  Admin Controls
+                  {t('dashboard.adminControls')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  As an administrator, you can modify the dashboard settings and refresh the data.
+                  {t('dashboard.adminControlsDesc')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button
@@ -326,7 +333,7 @@ const Dashboard: React.FC = () => {
                     onClick={handleRefresh}
                     disabled={refreshing}
                   >
-                    {refreshing ? 'Refreshing...' : 'Refresh All Data'}
+                    {refreshing ? t('dashboard.refreshing') : t('dashboard.refreshData')}
                   </Button>
                   <Button
                     variant="outlined"
@@ -334,7 +341,7 @@ const Dashboard: React.FC = () => {
                     component="a"
                     href="/settings"
                   >
-                    Data Configuration
+                    {t('dashboard.dataConfig')}
                   </Button>
                 </Box>
               </Paper>

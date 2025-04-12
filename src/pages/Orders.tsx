@@ -37,7 +37,8 @@ import {
 } from '@mui/icons-material';
 import { fetchOrderData } from '../services/api';
 import { Order, OrderItem } from '../types/order';
-import { formatCurrency } from '../utils/dateUtils';
+import { formatCurrency } from '../utils/formatUtils';
+import { useLanguage } from '../contexts/LanguageContext';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -63,6 +64,7 @@ const headCells: HeadCell[] = [
 ];
 
 const OrdersPage: React.FC = () => {
+  const { language } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -241,7 +243,7 @@ const OrdersPage: React.FC = () => {
                 Total Revenue
               </Typography>
               <Typography variant="h4">
-                {formatCurrency(totalRevenue)}
+                {formatCurrency(totalRevenue, language)}
               </Typography>
             </CardContent>
           </Card>
@@ -254,7 +256,7 @@ const OrdersPage: React.FC = () => {
                 Average Order Value
               </Typography>
               <Typography variant="h4">
-                {formatCurrency(avgOrderValue)}
+                {formatCurrency(avgOrderValue, language)}
               </Typography>
             </CardContent>
           </Card>
@@ -465,7 +467,7 @@ const OrdersPage: React.FC = () => {
                           {new Date(order.orderDate).toLocaleDateString()}
                         </TableCell>
                         <TableCell align="right">
-                          {formatCurrency(order.totalAmount)}
+                          {formatCurrency(order.totalAmount, language)}
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -509,10 +511,10 @@ const OrdersPage: React.FC = () => {
                                         {item.name}
                                       </TableCell>
                                       <TableCell>{item.serviceType}</TableCell>
-                                      <TableCell align="right">{formatCurrency(item.price)}</TableCell>
+                                      <TableCell align="right">{formatCurrency(item.price, language)}</TableCell>
                                       <TableCell align="right">{item.quantity}</TableCell>
                                       <TableCell align="right">
-                                        {formatCurrency(item.price * item.quantity)}
+                                        {formatCurrency(item.price * item.quantity, language)}
                                       </TableCell>
                                     </TableRow>
                                   ))}
@@ -522,7 +524,7 @@ const OrdersPage: React.FC = () => {
                                       <strong>Total:</strong>
                                     </TableCell>
                                     <TableCell align="right">
-                                      <strong>{formatCurrency(order.totalAmount)}</strong>
+                                      <strong>{formatCurrency(order.totalAmount, language)}</strong>
                                     </TableCell>
                                   </TableRow>
                                 </TableBody>

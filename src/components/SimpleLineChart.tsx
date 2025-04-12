@@ -13,6 +13,8 @@ import {
 } from 'chart.js';
 import { Box, CircularProgress } from '@mui/material';
 import { TrendData } from '../types/statistics';
+import { useLanguage } from '../contexts/LanguageContext';
+import { formatCurrency, formatNumber, formatCompactCurrency, formatCompactNumber } from '../utils/formatUtils';
 
 // Register ChartJS components
 ChartJS.register(
@@ -38,6 +40,7 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
   color = '#8e44ad',
   isCurrency = false
 }) => {
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(true);
 
   // Simulate loading
@@ -57,7 +60,7 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
     labels,
     datasets: [
       {
-        label: title,
+        label: t(title) || title,  // Use translated title if available
         data: data.map(item => item.value),
         borderColor: color,
         backgroundColor: `${color}20`,
@@ -85,7 +88,7 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
       },
       title: {
         display: true,
-        text: title,
+        text: t(title) || title,  // Use translated title if available
         font: {
           size: 16,
           weight: 'bold',
@@ -99,13 +102,17 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
               label += ': ';
             }
             if (context.parsed.y !== null) {
+              const value = context.parsed.y;
+              const threshold = 10000; // 超过这个阈值使用紧凑格式
+
               if (isCurrency) {
-                label += new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD'
-                }).format(context.parsed.y);
+                label += Math.abs(value) >= threshold
+                  ? formatCompactCurrency(value, language)
+                  : formatCurrency(value, language);
               } else {
-                label += new Intl.NumberFormat('en-US').format(context.parsed.y);
+                label += Math.abs(value) >= threshold
+                  ? formatCompactNumber(value, language)
+                  : formatNumber(value, language);
               }
             }
             return label;
@@ -118,8 +125,21 @@ const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
         beginAtZero: true,
         ticks: {
           callback: function(value) {
+            const threshold = 10000; // 超过这个阈值使用紧凑格式
+            const numValue = Number(value);
+
             if (isCurrency) {
-              return '$' + value;
+              const symbol = language === 'zh' ? '¥' : '$';
+              if (!isNaN(numValue) && Math.abs(numValue) >= threshold) {
+                // 使用紧凑格式，但不包含货币符号（因为我们手动添加）
+                const formatted = formatCompactNumber(numValue, language).replace(symbol, '');
+                return symbol + formatted;
+              }
+              return symbol + numValue;
+            }
+
+            if (!isNaN(numValue) && Math.abs(numValue) >= threshold) {
+              return formatCompactNumber(numValue, language);
             }
             return value;
           }

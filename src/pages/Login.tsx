@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Container, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  Alert, 
+import { useLanguage } from '../contexts/LanguageContext';
+import {
+  Box,
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
   CircularProgress,
   InputAdornment,
   IconButton,
@@ -22,6 +23,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { authState, login } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -30,13 +32,13 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const success = await login({ username, password });
       if (success) {
@@ -61,38 +63,38 @@ const Login: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            p: 4, 
-            width: '100%', 
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            width: '100%',
             borderRadius: 2,
             borderTop: '4px solid #8e44ad'
           }}
         >
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               mb: 3
             }}
           >
-            <Box 
-              sx={{ 
-                bgcolor: '#8e44ad', 
-                borderRadius: '50%', 
-                p: 1, 
-                mb: 2 
+            <Box
+              sx={{
+                bgcolor: '#8e44ad',
+                borderRadius: '50%',
+                p: 1,
+                mb: 2
               }}
             >
               <LockOutlined sx={{ color: 'white', fontSize: 30 }} />
             </Box>
             <Typography component="h1" variant="h5">
-              Beauty Chain Dashboard
+              {t('app.title')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Sign in to access your dashboard
+              {t('auth.signInTo')}
             </Typography>
           </Box>
 
@@ -108,7 +110,7 @@ const Login: React.FC = () => {
               required
               fullWidth
               id="username"
-              label="Username"
+              label={t('auth.username')}
               name="username"
               autoComplete="username"
               autoFocus
@@ -121,7 +123,7 @@ const Login: React.FC = () => {
               required
               fullWidth
               name="password"
-              label="Password"
+              label={t('auth.password')}
               type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
@@ -149,13 +151,13 @@ const Login: React.FC = () => {
               sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: '#8e44ad', '&:hover': { bgcolor: '#7d3c98' } }}
               disabled={isSubmitting}
             >
-              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
+              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : t('auth.login')}
             </Button>
-            
+
             <Grid container sx={{ mt: 2 }}>
               <Grid item xs={12}>
                 <Typography variant="body2" color="text.secondary" align="center">
-                  Demo Accounts:
+                  {t('auth.demoAccounts')}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
