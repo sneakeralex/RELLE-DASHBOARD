@@ -1,0 +1,41 @@
+import React, { Component } from 'react';
+import { fetchTotalUsers, fetchRecentWeekUsers, fetchRecentMonthUsers } from '../services/userService';
+
+class UserStats extends Component {
+    state = {
+        totalUsers: 0,
+        recentWeekUsers: 0,
+        recentMonthUsers: 0,
+    };
+
+    componentDidMount() {
+        this.loadUserStats();
+    }
+
+    loadUserStats = async () => {
+        const totalUsers = await fetchTotalUsers();
+        const recentWeekUsers = await fetchRecentWeekUsers();
+        const recentMonthUsers = await fetchRecentMonthUsers();
+
+        this.setState({
+            totalUsers,
+            recentWeekUsers,
+            recentMonthUsers,
+        });
+    };
+
+    render() {
+        const { totalUsers, recentWeekUsers, recentMonthUsers } = this.state;
+
+        return (
+            <div>
+                <h2>User Statistics</h2>
+                <p>Total Users: {totalUsers}</p>
+                <p>Users in the Last Week: {recentWeekUsers}</p>
+                <p>Users in the Last Month: {recentMonthUsers}</p>
+            </div>
+        );
+    }
+}
+
+export default UserStats;
