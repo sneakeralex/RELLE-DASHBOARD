@@ -4,12 +4,40 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { fetchDashboardData, refreshMockData } from '../services/api';
 import { DashboardData } from '../types/statistics';
 import SimpleLineChart from './SimpleLineChart';
+import PieChart from './Charts/PieChart';
+import HeatMap from './Charts/HeatMap';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard: React.FC = () => {
+  const { authState } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  // Mock data for service distribution
+  const [serviceData, setServiceData] = useState({
+    labels: ['Haircut', 'Coloring', 'Styling', 'Manicure', 'Pedicure', 'Facial', 'Massage', 'Waxing'],
+    data: [120, 85, 65, 95, 75, 55, 40, 35]
+  });
+
+  // Mock data for busy hours heatmap
+  const [busyHoursData, setBusyHoursData] = useState({
+    xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    yLabels: ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM'],
+    data: [
+      [12, 15, 8, 10, 18, 25, 5],
+      [15, 18, 12, 14, 22, 28, 8],
+      [20, 22, 18, 16, 25, 30, 12],
+      [25, 20, 22, 18, 20, 25, 15],
+      [15, 18, 20, 22, 24, 20, 10],
+      [18, 20, 22, 24, 28, 22, 12],
+      [22, 24, 26, 20, 22, 18, 8],
+      [18, 20, 15, 16, 20, 15, 5],
+      [12, 15, 10, 12, 18, 10, 3],
+      [8, 10, 8, 6, 12, 5, 2]
+    ]
+  });
 
   const loadDashboardData = async () => {
     try {
@@ -189,6 +217,33 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
+                Service Distribution
+              </Typography>
+              <PieChart
+                title="Popular Services"
+                labels={serviceData.labels}
+                data={serviceData.data}
+              />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Busy Hours by Day
+              </Typography>
+              <HeatMap
+                title="Customer Traffic"
+                data={busyHoursData.data}
+                xLabels={busyHoursData.xLabels}
+                yLabels={busyHoursData.yLabels}
+              />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
                 Recent Users
               </Typography>
               <TableContainer>
@@ -254,6 +309,37 @@ const Dashboard: React.FC = () => {
               </TableContainer>
             </Paper>
           </Grid>
+
+          {authState.user?.role === 'admin' && (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Admin Controls
+                </Typography>
+                <Typography variant="body2" color="text.secondary" paragraph>
+                  As an administrator, you can modify the dashboard settings and refresh the data.
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                  >
+                    {refreshing ? 'Refreshing...' : 'Refresh All Data'}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    component="a"
+                    href="/settings"
+                  >
+                    Data Configuration
+                  </Button>
+                </Box>
+              </Paper>
+            </Grid>
+          )}
         </Grid>
       )}
 

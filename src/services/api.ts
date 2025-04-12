@@ -1,7 +1,7 @@
 import { User } from '../types/user';
 import { Order } from '../types/order';
 import { generateMockData } from './mockDataService';
-import { DashboardData, TrendData } from '../types/statistics';
+import { DashboardData, TrendData, ServiceData, BusyHoursData } from '../types/statistics';
 import { calculateUserStats, calculateOrderStats, generateTrendData } from '../utils/statisticsUtils';
 
 // In a real application, these would be actual API calls
@@ -60,6 +60,32 @@ export const fetchDashboardData = async (): Promise<DashboardData> => {
     const orderTrend = generateTrendData(orders, 'orderDate', '', 30);
     const revenueTrend = generateTrendData(orders, 'orderDate', 'totalAmount', 30);
 
+    // Generate service distribution data
+    const serviceTypes = ['Haircut', 'Coloring', 'Styling', 'Manicure', 'Pedicure', 'Facial', 'Massage', 'Waxing'];
+    const serviceDistribution: ServiceData[] = serviceTypes.map(name => {
+        const count = Math.floor(Math.random() * 100) + 20;
+        const avgPrice = Math.floor(Math.random() * 50) + 30;
+        return {
+            name,
+            count,
+            revenue: count * avgPrice
+        };
+    });
+
+    // Generate busy hours data
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const busyHours: BusyHoursData[] = [];
+
+    for (let dayIndex = 0; dayIndex < days.length; dayIndex++) {
+        for (let hour = 9; hour <= 18; hour++) {
+            busyHours.push({
+                day: days[dayIndex],
+                hour,
+                count: Math.floor(Math.random() * 30) + (hour >= 11 && hour <= 14 ? 10 : 0) + (dayIndex >= 4 ? 15 : 0)
+            });
+        }
+    }
+
     return {
         userStats,
         orderStats,
@@ -67,7 +93,9 @@ export const fetchDashboardData = async (): Promise<DashboardData> => {
         recentOrders,
         userTrend,
         orderTrend,
-        revenueTrend
+        revenueTrend,
+        serviceDistribution,
+        busyHours
     };
 };
 

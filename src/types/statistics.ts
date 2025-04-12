@@ -2,6 +2,18 @@ import { UserStats } from './user';
 import { OrderStats } from './order';
 import { ReactNode } from 'react';
 
+export interface ServiceData {
+  name: string;
+  count: number;
+  revenue: number;
+}
+
+export interface BusyHoursData {
+  day: string;
+  hour: number;
+  count: number;
+}
+
 export interface DashboardData {
   userStats: UserStats;
   orderStats: OrderStats;
@@ -10,6 +22,8 @@ export interface DashboardData {
   userTrend: TrendData[];
   orderTrend: TrendData[];
   revenueTrend: TrendData[];
+  serviceDistribution: ServiceData[];
+  busyHours: BusyHoursData[];
 }
 
 export interface RecentUser {
