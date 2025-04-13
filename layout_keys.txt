@@ -1,0 +1,13 @@
+app.title
+common.darkMode
+common.lightMode
+nav.dashboard
+nav.dataConfig
+nav.logout
+nav.orders
+nav.profile
+nav.settings
+nav.shops
+nav.users
+profile.loggedInAs
+profile.role

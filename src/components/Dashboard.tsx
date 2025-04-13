@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
     <Box className="dashboard-container">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1" gutterBottom>
-          {t('dashboard.title') || 'Beauty Chain Dashboard'}
+          {t('dashboard.title') || 'RELLE Dashboard'}
         </Typography>
         <Button
           variant="outlined"
@@ -258,7 +258,7 @@ const Dashboard: React.FC = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('users.name')}</TableCell>
-                      <TableCell>{t('users.email')}</TableCell>
+                      <TableCell>{t('users.phone')}</TableCell>
                       <TableCell>{t('users.joined')}</TableCell>
                       <TableCell align="right">{t('users.spent')}</TableCell>
                     </TableRow>
@@ -267,8 +267,7 @@ const Dashboard: React.FC = () => {
                     {dashboardData.recentUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{new Date(user.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}</TableCell>
+                        <TableCell>{user.phone}</TableCell>
                         <TableCell align="right">{formatCurrency(user.totalSpent, language)}</TableCell>
                       </TableRow>
                     ))}
@@ -436,7 +435,7 @@ const Dashboard: React.FC = () => {
                     {dashboardData.recentUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>{user.name}</TableCell>
-                        <TableCell>{new Date(user.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}</TableCell>
+                        <TableCell>{user.phone}</TableCell>
                         <TableCell align="right">{formatCurrency(user.totalSpent, language)}</TableCell>
                       </TableRow>
                     ))}
@@ -506,11 +505,11 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Order Trend
+                {t("dashboard.orderTrend") || "Order Trend"}
               </Typography>
               <SimpleLineChart
                 data={dashboardData.orderTrend}
-                title="Orders Over Time"
+                title={t("dashboard.ordersOverTime") || "Orders Over Time"}
                 color="#e74c3c"
               />
             </Paper>
@@ -519,11 +518,11 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Revenue Trend
+                {t("dashboard.revenueTrend") || "Revenue Trend"}
               </Typography>
               <SimpleLineChart
                 data={dashboardData.revenueTrend}
-                title="Revenue Over Time"
+                title={t("dashboard.revenueOverTime") || "Revenue Over Time"}
                 color="#2ecc71"
                 isCurrency={true}
               />
@@ -533,27 +532,27 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Recent Orders
+                {t("dashboard.recentOrders") || "Recent Orders"}
               </Typography>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Customer</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell align="right">Amount</TableCell>
-                      <TableCell align="right">Status</TableCell>
+                      <TableCell>{t("orders.customer") || "Customer"}</TableCell>
+                      <TableCell>{t("orders.date") || "Date"}</TableCell>
+                      <TableCell align="right">{t("orders.amount") || "Amount"}</TableCell>
+                      <TableCell align="right">{t("orders.status") || "Status"}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {dashboardData.recentOrders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell>{order.customerName}</TableCell>
-                        <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                        <TableCell align="right">${order.totalAmount.toLocaleString()}</TableCell>
+                        <TableCell>{new Date(order.orderDate).toLocaleDateString(language === "zh" ? "zh-CN" : "en-US")}</TableCell>
+                        <TableCell align="right">{formatCurrency(order.totalAmount, language)}</TableCell>
                         <TableCell align="right">
                           <Chip
-                            label={order.status}
+                            label={t(`orders.${order.status}`) || order.status}
                             color={
                               order.status === 'completed' ? 'success' :
                               order.status === 'pending' ? 'warning' : 'error'

@@ -59,7 +59,7 @@ const getHeadCells = (t: any): HeadCell[] => [
   { id: 'totalAmount', label: t('orders.amount') || 'Amount', numeric: true, sortable: true },
   { id: 'status', label: t('orders.status') || 'Status', numeric: false, sortable: true },
   { id: 'paymentMethod', label: t('orders.paymentMethod') || 'Payment Method', numeric: false, sortable: true },
-  { id: 'location', label: t('orders.location') || 'Location', numeric: false, sortable: true },
+  { id: 'staffName', label: t('orders.beautician') || 'Beautician', numeric: false, sortable: true },
   { id: 'actions', label: t('common.actions') || 'Actions', numeric: false, sortable: false }
 ];
 
@@ -76,7 +76,7 @@ const OrdersPage: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [locationFilter, setLocationFilter] = useState<string>('all');
+  const [staffFilter, setStaffFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
@@ -116,9 +116,9 @@ const OrdersPage: React.FC = () => {
       result = result.filter(order => order.status === statusFilter);
     }
 
-    // Apply location filter
-    if (locationFilter !== 'all') {
-      result = result.filter(order => order.location === locationFilter);
+    // Apply staff filter
+    if (staffFilter !== 'all') {
+      result = result.filter(order => order.staffName === staffFilter);
     }
 
     // Apply date filters
@@ -158,7 +158,7 @@ const OrdersPage: React.FC = () => {
     });
 
     setFilteredOrders(result);
-  }, [orders, searchTerm, statusFilter, locationFilter, startDate, endDate, order, orderBy]);
+  }, [orders, searchTerm, statusFilter, staffFilter, startDate, endDate, order, orderBy]);
 
   const handleRequestSort = (property: keyof Order) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -193,16 +193,16 @@ const OrdersPage: React.FC = () => {
     setStartDate(null);
     setEndDate(null);
     setStatusFilter('all');
-    setLocationFilter('all');
+    setStaffFilter('all');
   };
 
   const handleExpandRow = (orderId: string) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
-  // Get unique locations for filter
-  const uniqueLocations = orders.map(order => order.location || '').filter(Boolean);
-  const locations = ['all', ...Array.from(new Set(uniqueLocations))];
+  // Get unique staff names for filter
+  const uniqueStaffNames = orders.map(order => order.staffName || '').filter(Boolean);
+  const staffNames = ['all', ...Array.from(new Set(uniqueStaffNames))];
 
   // Calculate statistics
   const totalOrders = filteredOrders.length;
@@ -378,15 +378,15 @@ const OrdersPage: React.FC = () => {
 
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size="small">
-                  <InputLabel>{t('orders.location') || 'Location'}</InputLabel>
+                  <InputLabel>{t('orders.beautician') || 'Beautician'}</InputLabel>
                   <Select
-                    value={locationFilter}
-                    label={t('orders.location') || 'Location'}
-                    onChange={(e) => setLocationFilter(e.target.value)}
+                    value={staffFilter}
+                    label={t('orders.beautician') || 'Beautician'}
+                    onChange={(e) => setStaffFilter(e.target.value)}
                   >
-                    {locations.map((location) => (
-                      <MenuItem key={location} value={location}>
-                        {location === 'all' ? t('orders.allLocations') || 'All Locations' : location}
+                    {staffNames.map((staff) => (
+                      <MenuItem key={staff} value={staff}>
+                        {staff === 'all' ? t('orders.allBeauticians') || 'All Beauticians' : staff}
                       </MenuItem>
                     ))}
                   </Select>
@@ -482,7 +482,7 @@ const OrdersPage: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell>{order.paymentMethod}</TableCell>
-                        <TableCell>{order.location}</TableCell>
+                        <TableCell>{order.staffName}</TableCell>
                         <TableCell>
                           <IconButton size="small" color="primary">
                             <VisibilityIcon fontSize="small" />
@@ -537,7 +537,7 @@ const OrdersPage: React.FC = () => {
                                     <strong>Staff:</strong> {order.staffName}
                                   </Typography>
                                   <Typography variant="body2">
-                                    <strong>Location:</strong> {order.location}
+                                    <strong>{t("orders.beautician") || "Beautician"}:</strong> {order.staffName}
                                   </Typography>
                                 </Box>
                                 <Box>

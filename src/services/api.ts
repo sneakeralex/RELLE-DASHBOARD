@@ -50,7 +50,7 @@ export const fetchDashboardData = async (): Promise<DashboardData> => {
         .map(user => ({
             id: user.id,
             name: user.name,
-            email: user.email,
+            phone: user.phone || "",
             createdAt: user.createdAt,
             totalSpent: user.totalSpent || 0
         }));

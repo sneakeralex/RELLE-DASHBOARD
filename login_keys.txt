@@ -1,0 +1,6 @@
+app.title
+auth.demoAccounts
+auth.login
+auth.password
+auth.signInTo
+auth.username

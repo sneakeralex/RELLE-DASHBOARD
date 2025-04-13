@@ -7,7 +7,6 @@ export interface Order {
     status: 'pending' | 'completed' | 'canceled';
     items?: OrderItem[];
     paymentMethod?: string;
-    location?: string;
     staffId?: string;
     staffName?: string;
 }

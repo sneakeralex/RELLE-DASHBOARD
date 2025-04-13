@@ -2,6 +2,8 @@ import { User } from '../types/user';
 import { Order, OrderItem } from '../types/order';
 import { Shop } from '../types/shop';
 import { subDays, addDays, format } from 'date-fns';
+import { employeeNames } from './employeeNames';
+import { shopNames, shopIntroductions } from './shopNames';
 
 // Generate random date within a range
 const randomDate = (start: Date, end: Date): string => {
@@ -44,32 +46,6 @@ const chineseServiceTypes = ['剪发', '染发', '造型', '美甲', '足疗', '
 // Chinese payment methods
 const chinesePaymentMethods = ['支付宝', '微信支付', '银联卡', '现金', '礼品卡'];
 
-// Chinese staff names
-const chineseStaffNames = ['小红', '小明', '小芳', '小丽', '小强', '小杰', '小娟', '小华', '小燕', '小龙'];
-
-// Shop names
-const shopNames = [
-  '美丽空间旗舰店',
-  '魅力风尚店',
-  '靓颜美妆中心',
-  '时尚美肤馆',
-  '优雅美容院',
-  '尚美造型店',
-  '丽人美妆店',
-  '美丽传奇店',
-  '魅力无限店',
-  '美丽人生店'
-];
-
-// Shop introductions
-const shopIntroductions = [
-  '本店专注于提供高品质的美容美发服务，拥有专业的技术团队和舒适的环境，致力于为每位顾客带来美丽与自信。',
-  '作为美丽空间连锁的旗舰店，我们提供全方位的美容美发服务，包括剪发、染发、造型、美甲、足疗、面部护理等，让您焕发光彩。',
-  '我们的店铺环境舒适，设备先进，技术精湛，为顾客提供一站式美容美发服务，让您在忙碌的生活中找到放松与美丽。',
-  '本店秉承"美丽源于专业"的理念，提供个性化的美容美发方案，满足不同顾客的需求，让每位顾客都能找到属于自己的美丽。',
-  '我们的团队由经验丰富的美容美发师组成，他们不断学习国际最新技术，为顾客带来时尚前沿的美容美发体验。'
-];
-
 // Generate random Chinese name
 const generateChineseName = (): string => {
   const firstName = chineseFirstNames[randomNumber(0, chineseFirstNames.length - 1)];
@@ -87,8 +63,19 @@ const generateChinesePhoneNumber = (): string => {
 
 // Generate random unionid (similar to WeChat unionid)
 const generateUnionId = (): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  return Array(28).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
+  return 'ojqzL' + Array(23).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+};
+
+// Generate random mini_openid
+const generateMiniOpenId = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
+  return 'o4GyE5' + Array(22).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+};
+
+// Generate customer ID with leading zeros
+const generateCustomerId = (index: number): string => {
+  return String(index).padStart(8, '0');
 };
 
 // Generate random birthday
@@ -97,6 +84,22 @@ const generateBirthday = (): string => {
   const month = randomNumber(1, 12).toString().padStart(2, '0');
   const day = randomNumber(1, 28).toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
+};
+
+// Calculate age from birthdate
+const calculateAge = (birthdate: string): number => {
+  if (!birthdate) return 0;
+  
+  const today = new Date();
+  const birthDate = new Date(birthdate);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  
+  return age;
 };
 
 // Generate random avatar URL
@@ -116,12 +119,12 @@ export const generateRelleShops = (count: number = 10): Shop[] => {
   const shops: Shop[] = [];
   const now = new Date();
   const oneYearAgo = subDays(now, 365);
-
+  
   for (let i = 0; i < count; i++) {
     const openDate = randomDate(subDays(oneYearAgo, 1000), oneYearAgo);
     const createTime = randomDate(new Date(openDate), now);
     const updateTime = randomDate(new Date(createTime), now);
-
+    
     shops.push({
       id: i + 1,
       name: shopNames[i % shopNames.length],
@@ -136,34 +139,43 @@ export const generateRelleShops = (count: number = 10): Shop[] => {
       updatedAt: updateTime
     });
   }
-
+  
   return shops;
 };
 
-// Generate mock users based on relle_customer table
+// Generate mock users based on app_customer_info table in relle_mall_release database
 export const generateRelleCustomers = (count: number = 100): any[] => {
   const customers: any[] = [];
   const now = new Date();
   const startDate = subDays(now, 365); // 1 year ago
-
+  
   for (let i = 0; i < count; i++) {
-    const createTime = randomDate(startDate, now);
-    const updateTime = randomDate(new Date(createTime), now);
-
+    const customerId = generateCustomerId(i + 54); // Starting from 54 as seen in the database
+    const unionid = generateUnionId();
+    const miniOpenid = generateMiniOpenId();
+    const wechatNickname = Math.random() > 0.7 ? generateChineseName() : '';
+    const wechatPhone = Math.random() > 0.5 ? generateChinesePhoneNumber() : '';
+    const userGender = randomNumber(0, 2); // 0: unknown, 1: male, 2: female
+    const userBirthdate = Math.random() > 0.6 ? generateBirthday() : '';
+    const createdAt = randomDate(startDate, now);
+    const updatedAt = randomDate(new Date(createdAt), now);
+    
     customers.push({
-      id: i + 1,
-      unionid: generateUnionId(),
-      name: generateChineseName(),
-      phone: generateChinesePhoneNumber(),
-      avatar: generateAvatarUrl(),
-      birthday: generateBirthday(),
-      create_user_id: `admin${randomNumber(1, 5)}`,
-      create_time: createTime,
-      update_user_id: `admin${randomNumber(1, 5)}`,
-      update_time: updateTime
+      id: customerId,
+      unionid: unionid,
+      mini_openid: miniOpenid,
+      wechat_nickname: wechatNickname,
+      wechat_phone: wechatPhone,
+      user_gender: userGender,
+      user_birthdate: userBirthdate,
+      avatar: '/relle-media/avatar/default.png',
+      name: wechatNickname || `用户${customerId}`, // For compatibility with existing code
+      phone: wechatPhone,
+      create_time: createdAt,
+      update_time: updatedAt
     });
   }
-
+  
   return customers;
 };
 
@@ -172,7 +184,7 @@ export const generateRelleOrders = (customers: any[], count: number = 300): any[
   const orders: any[] = [];
   const now = new Date();
   const startDate = subDays(now, 365); // 1 year ago
-
+  
   for (let i = 0; i < count; i++) {
     const customerIndex = randomNumber(0, customers.length - 1);
     const customer = customers[customerIndex];
@@ -182,7 +194,7 @@ export const generateRelleOrders = (customers: any[], count: number = 300): any[
     const payTime = status >= 1 ? randomDate(new Date(placeOrderTime), now) : null;
     const createTime = placeOrderTime;
     const updateTime = payTime || createTime;
-
+    
     orders.push({
       order_no: generateOrderNumber(),
       customer_id: customer.id,
@@ -196,23 +208,32 @@ export const generateRelleOrders = (customers: any[], count: number = 300): any[
       update_time: updateTime
     });
   }
-
+  
   return orders;
 };
 
 // Convert relle_customer to User type for the dashboard
 const convertToUser = (customer: any): User => {
+  const birthdate = customer.user_birthdate || '';
+  const age = calculateAge(birthdate);
+  
   return {
-    id: `user-${customer.id}`,
+    id: customer.id, // Use customer_id directly as id
     name: customer.name,
-    email: `${customer.phone}@example.com`, // Generate email from phone
-    phone: customer.phone,
+    phone: customer.phone || generateChinesePhoneNumber(), // Ensure phone is always populated
     createdAt: customer.create_time,
     updatedAt: customer.update_time,
     lastVisit: customer.update_time,
     totalSpent: randomNumber(0, 10000),
     loyaltyPoints: randomNumber(0, 2000),
-    preferredLocation: chineseLocations[randomNumber(0, chineseLocations.length - 1)]
+    preferredLocation: chineseLocations[randomNumber(0, chineseLocations.length - 1)],
+    // Additional fields from app_customer_info
+    unionid: customer.unionid,
+    miniOpenid: customer.mini_openid,
+    gender: customer.user_gender || 0, // Renamed from userGender to gender
+    birthdate: birthdate, // Renamed from userBirthdate to birthdate
+    age: age, // Added age field
+    avatarSrc: customer.avatar || '/relle-media/avatar/default.png'
   };
 };
 
@@ -223,7 +244,7 @@ const convertToOrder = (order: any, customers: any[]): Order => {
     const serviceType = chineseServiceTypes[randomNumber(0, chineseServiceTypes.length - 1)];
     const price = randomDecimal(50, 500, 2);
     const quantity = randomNumber(1, 3);
-
+    
     return {
       id: `item-${index + 1}`,
       name: serviceType,
@@ -232,7 +253,7 @@ const convertToOrder = (order: any, customers: any[]): Order => {
       serviceType
     };
   });
-
+  
   let status: 'pending' | 'completed' | 'canceled';
   switch (order.status) {
     case 0:
@@ -248,19 +269,18 @@ const convertToOrder = (order: any, customers: any[]): Order => {
     default:
       status = 'pending';
   }
-
+  
   return {
     id: order.order_no,
-    userId: `user-${order.customer_id}`,
+    userId: order.customer_id,
     customerName: customer.name,
     totalAmount: order.amount,
     orderDate: order.place_order_time,
     status,
     items: orderItems,
     paymentMethod: chinesePaymentMethods[randomNumber(0, chinesePaymentMethods.length - 1)],
-    location: chineseLocations[randomNumber(0, chineseLocations.length - 1)],
-    staffId: `staff-${randomNumber(1, 10)}`,
-    staffName: chineseStaffNames[randomNumber(0, chineseStaffNames.length - 1)]
+    staffId: `staff-${randomNumber(1, employeeNames.length)}`,
+    staffName: employeeNames[randomNumber(0, employeeNames.length - 1)]
   };
 };
 
@@ -269,18 +289,18 @@ export const generateRelleMallMockData = (userCount: number = 100, orderCount: n
   // Ensure the counts are within the allowed ranges
   const validUserCount = Math.max(100, Math.min(100000, userCount));
   const validOrderCount = Math.max(100, Math.min(50000, orderCount));
-
+  
   console.log(`Generating mock data with ${validUserCount} customers and ${validOrderCount} orders`);
-
+  
   // Generate data based on relle database tables
   const shops = generateRelleShops(10);
   const customers = generateRelleCustomers(validUserCount);
   const orders = generateRelleOrders(customers, validOrderCount);
-
+  
   // Convert to dashboard data types
   const users: User[] = customers.map(convertToUser);
   const dashboardOrders: Order[] = orders.map(order => convertToOrder(order, customers));
-
+  
   return {
     users,
     orders: dashboardOrders,

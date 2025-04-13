@@ -50,7 +50,9 @@ interface HeadCell {
 const getHeadCells = (t: any): HeadCell[] => [
   { id: 'id', label: t('users.id') || 'ID', numeric: false, sortable: true },
   { id: 'name', label: t('users.name') || 'Name', numeric: false, sortable: true },
-  { id: 'email', label: t('users.email') || 'Email', numeric: false, sortable: true },
+  { id: 'phone', label: t('users.phone') || 'Phone', numeric: false, sortable: true },
+  { id: 'gender', label: t('users.gender') || 'Gender', numeric: false, sortable: true },
+  { id: 'age', label: t('users.age') || 'Age', numeric: true, sortable: true },
   { id: 'createdAt', label: t('users.joined') || 'Joined Date', numeric: false, sortable: true },
   { id: 'lastVisit', label: t('users.lastVisit') || 'Last Visit', numeric: false, sortable: true },
   { id: 'totalSpent', label: t('users.spent') || 'Total Spent', numeric: true, sortable: true },
@@ -99,7 +101,7 @@ const UsersPage: React.FC = () => {
       result = result.filter(
         user =>
           user.name.toLowerCase().includes(lowerCaseSearch) ||
-          user.email.toLowerCase().includes(lowerCaseSearch) ||
+          (user.phone ? user.phone.includes(searchTerm) : false) ||
           user.id.toLowerCase().includes(lowerCaseSearch)
       );
     }
@@ -386,7 +388,13 @@ const UsersPage: React.FC = () => {
                           {user.name}
                         </Box>
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.phone}</TableCell>
+                      <TableCell>
+                        {user.gender === 0 ? (t('users.genderUnknown') || 'Unknown') : 
+                         user.gender === 1 ? (t('users.genderMale') || 'Male') : 
+                         (t('users.genderFemale') || 'Female')}
+                      </TableCell>
+                      <TableCell>{user.age || '-'}</TableCell>
                       <TableCell>
                         {new Date(user.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}
                       </TableCell>
