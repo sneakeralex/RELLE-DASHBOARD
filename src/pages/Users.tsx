@@ -47,19 +47,19 @@ interface HeadCell {
   sortable: boolean;
 }
 
-const headCells: HeadCell[] = [
-  { id: 'id', label: 'ID', numeric: false, sortable: true },
-  { id: 'name', label: 'Name', numeric: false, sortable: true },
-  { id: 'email', label: 'Email', numeric: false, sortable: true },
-  { id: 'createdAt', label: 'Joined Date', numeric: false, sortable: true },
-  { id: 'lastVisit', label: 'Last Visit', numeric: false, sortable: true },
-  { id: 'totalSpent', label: 'Total Spent', numeric: true, sortable: true },
-  { id: 'loyaltyPoints', label: 'Loyalty Points', numeric: true, sortable: true },
-  { id: 'actions', label: 'Actions', numeric: false, sortable: false }
+const getHeadCells = (t: any): HeadCell[] => [
+  { id: 'id', label: t('users.id') || 'ID', numeric: false, sortable: true },
+  { id: 'name', label: t('users.name') || 'Name', numeric: false, sortable: true },
+  { id: 'email', label: t('users.email') || 'Email', numeric: false, sortable: true },
+  { id: 'createdAt', label: t('users.joined') || 'Joined Date', numeric: false, sortable: true },
+  { id: 'lastVisit', label: t('users.lastVisit') || 'Last Visit', numeric: false, sortable: true },
+  { id: 'totalSpent', label: t('users.spent') || 'Total Spent', numeric: true, sortable: true },
+  { id: 'loyaltyPoints', label: t('users.loyaltyPoints') || 'Loyalty Points', numeric: true, sortable: true },
+  { id: 'actions', label: t('common.actions') || 'Actions', numeric: false, sortable: false }
 ];
 
 const UsersPage: React.FC = () => {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -188,10 +188,12 @@ const UsersPage: React.FC = () => {
   // Avoid a layout jump when reaching the last page with empty rows
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredUsers.length) : 0;
 
+  const headCells = getHeadCells(t);
+
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Users
+        {t('users.title') || 'Users'}
       </Typography>
 
       {/* Statistics Cards */}
@@ -200,7 +202,7 @@ const UsersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Total Users
+                {t('users.totalUsers') || 'Total Users'}
               </Typography>
               <Typography variant="h4">
                 {totalUsers.toLocaleString()}
@@ -213,7 +215,7 @@ const UsersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Total Spent
+                {t('users.totalSpent') || 'Total Spent'}
               </Typography>
               <Typography variant="h4">
                 {formatCurrency(totalSpent, language)}
@@ -226,7 +228,7 @@ const UsersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Average Spent
+                {t('users.averageSpent') || 'Average Spent'}
               </Typography>
               <Typography variant="h4">
                 {formatCurrency(avgSpent, language)}
@@ -239,7 +241,7 @@ const UsersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Avg. Loyalty Points
+                {t('users.avgLoyaltyPoints') || 'Avg. Loyalty Points'}
               </Typography>
               <Typography variant="h4">
                 {Math.round(avgLoyaltyPoints).toLocaleString()}
@@ -253,7 +255,7 @@ const UsersPage: React.FC = () => {
       <Paper sx={{ p: 2, mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <TextField
-            label="Search Users"
+            label={t('users.searchUsers') || 'Search Users'}
             variant="outlined"
             size="small"
             fullWidth
@@ -275,7 +277,7 @@ const UsersPage: React.FC = () => {
             onClick={() => setShowFilters(!showFilters)}
             sx={{ mr: 1, whiteSpace: 'nowrap' }}
           >
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+            {showFilters ? t('common.hideFilters') || 'Hide Filters' : t('common.showFilters') || 'Show Filters'}
           </Button>
 
           <Button
@@ -285,7 +287,7 @@ const UsersPage: React.FC = () => {
             disabled={loading}
             sx={{ whiteSpace: 'nowrap' }}
           >
-            Refresh
+            {t('common.refresh') || 'Refresh'}
           </Button>
         </Box>
 
@@ -296,7 +298,7 @@ const UsersPage: React.FC = () => {
               <Grid item xs={12} sm={5}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
-                    label="Start Date"
+                    label={t('common.startDate') || 'Start Date'}
                     value={startDate}
                     onChange={(newValue) => setStartDate(newValue)}
                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
@@ -307,7 +309,7 @@ const UsersPage: React.FC = () => {
               <Grid item xs={12} sm={5}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
-                    label="End Date"
+                    label={t('common.endDate') || 'End Date'}
                     value={endDate}
                     onChange={(newValue) => setEndDate(newValue)}
                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
@@ -321,7 +323,7 @@ const UsersPage: React.FC = () => {
                   onClick={handleClearFilters}
                   fullWidth
                 >
-                  Clear Filters
+                  {t('common.clearFilters') || 'Clear Filters'}
                 </Button>
               </Grid>
             </Grid>
@@ -366,7 +368,7 @@ const UsersPage: React.FC = () => {
               ) : filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={headCells.length} align="center">
-                    No users found
+                    {t('users.noUsersFound') || 'No users found'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -386,12 +388,12 @@ const UsersPage: React.FC = () => {
                       </TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {new Date(user.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}
                       </TableCell>
                       <TableCell>
                         {user.lastVisit
-                          ? new Date(user.lastVisit).toLocaleDateString()
-                          : 'Never'}
+                          ? new Date(user.lastVisit).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')
+                          : t('common.never') || 'Never'}
                       </TableCell>
                       <TableCell align="right">
                         {formatCurrency(user.totalSpent || 0, language)}

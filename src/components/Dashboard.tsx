@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
     <Box className="dashboard-container">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Beauty Chain Dashboard
+          {t('dashboard.title') || 'Beauty Chain Dashboard'}
         </Typography>
         <Button
           variant="outlined"
@@ -113,7 +113,7 @@ const Dashboard: React.FC = () => {
           onClick={handleRefresh}
           disabled={refreshing}
         >
-          {refreshing ? 'Refreshing...' : 'Refresh Data'}
+          {refreshing ? t('common.refreshing') || 'Refreshing...' : t('common.refreshData') || 'Refresh Data'}
         </Button>
       </Box>
 
@@ -268,7 +268,7 @@ const Dashboard: React.FC = () => {
                       <TableRow key={user.id}>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
-                        <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(user.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}</TableCell>
                         <TableCell align="right">{formatCurrency(user.totalSpent, language)}</TableCell>
                       </TableRow>
                     ))}
@@ -297,11 +297,11 @@ const Dashboard: React.FC = () => {
                     {dashboardData.recentOrders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell>{order.customerName}</TableCell>
-                        <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(order.orderDate).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}</TableCell>
                         <TableCell align="right">{formatCurrency(order.totalAmount, language)}</TableCell>
                         <TableCell align="right">
                           <Chip
-                            label={order.status}
+                            label={t(`orders.${order.status}`) || order.status}
                             color={
                               order.status === 'completed' ? 'success' :
                               order.status === 'pending' ? 'warning' : 'error'
@@ -355,13 +355,13 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h5" gutterBottom>
-                User Statistics
+                {t('dashboard.userStats')}
               </Typography>
               <Grid container spacing={3} sx={{ mt: 2 }}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f8f4fc' }}>
                     <Typography variant="h6" color="primary">
-                      Total Users
+                      {t('dashboard.totalUsers')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.userStats.totalUsers.toLocaleString()}
@@ -372,7 +372,7 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f4f8fc' }}>
                     <Typography variant="h6" color="primary">
-                      New Users (Today)
+                      {t('dashboard.newUsersToday')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.userStats.newUsersToday.toLocaleString()}
@@ -383,7 +383,7 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f4fcf8' }}>
                     <Typography variant="h6" color="primary">
-                      New Users (Week)
+                      {t('dashboard.newUsersWeek')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.userStats.newUsersThisWeek.toLocaleString()}
@@ -394,7 +394,7 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#fcf4f8' }}>
                     <Typography variant="h6" color="primary">
-                      New Users (Month)
+                      {t('dashboard.newUsersMonth')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.userStats.newUsersThisMonth.toLocaleString()}
@@ -408,11 +408,11 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={8}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                User Growth Trend
+                {t('dashboard.userGrowthTrend') || 'User Growth Trend'}
               </Typography>
               <SimpleLineChart
                 data={dashboardData.userTrend}
-                title="New Users Over Time"
+                title={t('dashboard.newUsersOverTime') || 'New Users Over Time'}
                 color="#8e44ad"
               />
             </Paper>
@@ -421,23 +421,23 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Recent Users
+                {t('dashboard.recentUsers') || 'Recent Users'}
               </Typography>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Joined</TableCell>
-                      <TableCell align="right">Spent</TableCell>
+                      <TableCell>{t('users.name')}</TableCell>
+                      <TableCell>{t('users.joined')}</TableCell>
+                      <TableCell align="right">{t('users.spent')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {dashboardData.recentUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>{user.name}</TableCell>
-                        <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell align="right">${user.totalSpent.toLocaleString()}</TableCell>
+                        <TableCell>{new Date(user.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}</TableCell>
+                        <TableCell align="right">{formatCurrency(user.totalSpent, language)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -453,13 +453,13 @@ const Dashboard: React.FC = () => {
           <Grid item xs={12}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h5" gutterBottom>
-                Order Statistics
+                {t('dashboard.orderStats')}
               </Typography>
               <Grid container spacing={3} sx={{ mt: 2 }}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f8f4fc' }}>
                     <Typography variant="h6" color="primary">
-                      Total Orders
+                      {t('dashboard.totalOrders')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.orderStats.totalOrders.toLocaleString()}
@@ -470,7 +470,7 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f4f8fc' }}>
                     <Typography variant="h6" color="primary">
-                      Orders (Today)
+                      {t('dashboard.ordersToday')}
                     </Typography>
                     <Typography variant="h3">
                       {dashboardData.orderStats.ordersToday.toLocaleString()}
@@ -481,10 +481,10 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f4fcf8' }}>
                     <Typography variant="h6" color="primary">
-                      Revenue (Today)
+                      {t('dashboard.revenueToday')}
                     </Typography>
                     <Typography variant="h3">
-                      ${dashboardData.orderStats.revenueToday.toLocaleString()}
+                      {formatCurrency(dashboardData.orderStats.revenueToday, language)}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -492,10 +492,10 @@ const Dashboard: React.FC = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#fcf4f8' }}>
                     <Typography variant="h6" color="primary">
-                      Avg. Order Value
+                      {t('dashboard.avgOrderValue')}
                     </Typography>
                     <Typography variant="h3">
-                      ${dashboardData.orderStats.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {formatCurrency(dashboardData.orderStats.averageOrderValue, language, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </Typography>
                   </Paper>
                 </Grid>

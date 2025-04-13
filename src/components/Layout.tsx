@@ -30,7 +30,9 @@ import {
   Logout as LogoutIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
-  ChevronLeft as ChevronLeftIcon
+  ChevronLeft as ChevronLeftIcon,
+  Store as StoreIcon,
+  Storage as StorageIcon
 } from '@mui/icons-material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -76,7 +78,9 @@ const Layout: React.FC<LayoutProps> = ({ children, toggleDarkMode, darkMode }) =
     { text: t('nav.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
     { text: t('nav.users'), icon: <PeopleIcon />, path: '/users' },
     { text: t('nav.orders'), icon: <ShoppingCartIcon />, path: '/orders' },
+    { text: t('nav.shops'), icon: <StoreIcon />, path: '/shops' },
     { text: t('nav.settings'), icon: <SettingsIcon />, path: '/settings' },
+    { text: t('nav.dataConfig') || 'Data Config', icon: <StorageIcon />, path: '/data-config' },
   ];
 
   return (

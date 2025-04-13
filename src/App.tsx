@@ -15,8 +15,10 @@ import Login from './pages/Login';
 import Dashboard from './components/Dashboard';
 import Users from './pages/Users';
 import Orders from './pages/Orders';
+import Shops from './pages/Shops';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import DataConfig from './pages/DataConfig';
 
 const AppContent: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -116,6 +118,17 @@ const AppContent: React.FC = () => {
                 <ProtectedRoute>
                   <Layout toggleDarkMode={toggleDarkMode} darkMode={darkMode}>
                     <Orders />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/shops"
+              element={
+                <ProtectedRoute>
+                  <Layout toggleDarkMode={toggleDarkMode} darkMode={darkMode}>
+                    <Shops />
                   </Layout>
                 </ProtectedRoute>
               }

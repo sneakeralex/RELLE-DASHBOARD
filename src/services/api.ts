@@ -1,13 +1,25 @@
 import { User } from '../types/user';
 import { Order } from '../types/order';
+import { Shop } from '../types/shop';
 import { generateMockData } from './mockDataService';
+import { generateRelleMallMockData } from './relleMallMockService';
 import { DashboardData, TrendData, ServiceData, BusyHoursData } from '../types/statistics';
 import { calculateUserStats, calculateOrderStats, generateTrendData } from '../utils/statisticsUtils';
 
 // In a real application, these would be actual API calls
-// For this demo, we're using mock data
+// For this demo, we're using mock data based on the relle database structure
 
-let mockData = generateMockData();
+// Configuration for mock data generation
+let mockDataConfig = {
+    userCount: 1000,
+    orderCount: 500
+};
+
+// Use relle database mock data
+let mockData = generateRelleMallMockData(mockDataConfig.userCount, mockDataConfig.orderCount);
+
+// Store shops data
+let shops = mockData.shops;
 
 export const fetchUserData = async (): Promise<User[]> => {
     // Simulate API call delay
@@ -60,20 +72,20 @@ export const fetchDashboardData = async (): Promise<DashboardData> => {
     const orderTrend = generateTrendData(orders, 'orderDate', '', 30);
     const revenueTrend = generateTrendData(orders, 'orderDate', 'totalAmount', 30);
 
-    // Generate service distribution data
-    const serviceTypes = ['Haircut', 'Coloring', 'Styling', 'Manicure', 'Pedicure', 'Facial', 'Massage', 'Waxing'];
+    // Generate service distribution data based on Chinese service types
+    const serviceTypes = ['剪发', '染发', '造型', '美甲', '足疗', '面部护理', '按摩', '脱毛'];
     const serviceDistribution: ServiceData[] = serviceTypes.map(name => {
         const count = Math.floor(Math.random() * 100) + 20;
-        const avgPrice = Math.floor(Math.random() * 50) + 30;
+        const avgPrice = Math.floor(Math.random() * 200) + 100; // Higher prices for Chinese market
         return {
-            name,
+            name: name,
             count,
             revenue: count * avgPrice
         };
     });
 
-    // Generate busy hours data
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    // Generate busy hours data with Chinese day names
+    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
     const busyHours: BusyHoursData[] = [];
 
     for (let dayIndex = 0; dayIndex < days.length; dayIndex++) {
@@ -100,7 +112,25 @@ export const fetchDashboardData = async (): Promise<DashboardData> => {
 };
 
 // In a real application, you would have functions to create/update/delete data
+export const setMockDataConfig = async (userCount: number, orderCount: number): Promise<void> => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Update the configuration
+    mockDataConfig = {
+        userCount,
+        orderCount
+    };
+};
+
+export const fetchShopData = async (): Promise<Shop[]> => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return mockData.shops || [];
+};
+
 export const refreshMockData = () => {
-    mockData = generateMockData();
+    mockData = generateRelleMallMockData(mockDataConfig.userCount, mockDataConfig.orderCount);
+    shops = mockData.shops;
     return mockData;
 };

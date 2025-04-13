@@ -52,19 +52,19 @@ interface HeadCell {
   sortable: boolean;
 }
 
-const headCells: HeadCell[] = [
-  { id: 'id', label: 'Order ID', numeric: false, sortable: true },
-  { id: 'customerName', label: 'Customer', numeric: false, sortable: true },
-  { id: 'orderDate', label: 'Order Date', numeric: false, sortable: true },
-  { id: 'totalAmount', label: 'Amount', numeric: true, sortable: true },
-  { id: 'status', label: 'Status', numeric: false, sortable: true },
-  { id: 'paymentMethod', label: 'Payment Method', numeric: false, sortable: true },
-  { id: 'location', label: 'Location', numeric: false, sortable: true },
-  { id: 'actions', label: 'Actions', numeric: false, sortable: false }
+const getHeadCells = (t: any): HeadCell[] => [
+  { id: 'id', label: t('orders.orderId') || 'Order ID', numeric: false, sortable: true },
+  { id: 'customerName', label: t('orders.customer') || 'Customer', numeric: false, sortable: true },
+  { id: 'orderDate', label: t('orders.orderDate') || 'Order Date', numeric: false, sortable: true },
+  { id: 'totalAmount', label: t('orders.amount') || 'Amount', numeric: true, sortable: true },
+  { id: 'status', label: t('orders.status') || 'Status', numeric: false, sortable: true },
+  { id: 'paymentMethod', label: t('orders.paymentMethod') || 'Payment Method', numeric: false, sortable: true },
+  { id: 'location', label: t('orders.location') || 'Location', numeric: false, sortable: true },
+  { id: 'actions', label: t('common.actions') || 'Actions', numeric: false, sortable: false }
 ];
 
 const OrdersPage: React.FC = () => {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -215,10 +215,12 @@ const OrdersPage: React.FC = () => {
   // Avoid a layout jump when reaching the last page with empty rows
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredOrders.length) : 0;
 
+  const headCells = getHeadCells(t);
+
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Orders
+        {t('orders.title') || 'Orders'}
       </Typography>
 
       {/* Statistics Cards */}
@@ -227,7 +229,7 @@ const OrdersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Total Orders
+                {t('orders.totalOrders') || 'Total Orders'}
               </Typography>
               <Typography variant="h4">
                 {totalOrders.toLocaleString()}
@@ -240,7 +242,7 @@ const OrdersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Total Revenue
+                {t('orders.totalRevenue') || 'Total Revenue'}
               </Typography>
               <Typography variant="h4">
                 {formatCurrency(totalRevenue, language)}
@@ -253,7 +255,7 @@ const OrdersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Average Order Value
+                {t('orders.avgOrderValue') || 'Average Order Value'}
               </Typography>
               <Typography variant="h4">
                 {formatCurrency(avgOrderValue, language)}
@@ -266,23 +268,23 @@ const OrdersPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
-                Order Status
+                {t('orders.orderStatus') || 'Order Status'}
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                 <Chip
-                  label={`Pending: ${pendingOrders}`}
+                  label={`${t('orders.pending') || 'Pending'}: ${pendingOrders}`}
                   color="warning"
                   size="small"
                   sx={{ mr: 0.5 }}
                 />
                 <Chip
-                  label={`Completed: ${completedOrders}`}
+                  label={`${t('orders.completed') || 'Completed'}: ${completedOrders}`}
                   color="success"
                   size="small"
                   sx={{ mr: 0.5 }}
                 />
                 <Chip
-                  label={`Canceled: ${canceledOrders}`}
+                  label={`${t('orders.canceled') || 'Canceled'}: ${canceledOrders}`}
                   color="error"
                   size="small"
                 />
@@ -296,7 +298,7 @@ const OrdersPage: React.FC = () => {
       <Paper sx={{ p: 2, mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <TextField
-            label="Search Orders"
+            label={t('orders.searchOrders') || 'Search Orders'}
             variant="outlined"
             size="small"
             fullWidth
@@ -318,7 +320,7 @@ const OrdersPage: React.FC = () => {
             onClick={() => setShowFilters(!showFilters)}
             sx={{ mr: 1, whiteSpace: 'nowrap' }}
           >
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+            {showFilters ? t('common.hideFilters') || 'Hide Filters' : t('common.showFilters') || 'Show Filters'}
           </Button>
 
           <Button
@@ -328,7 +330,7 @@ const OrdersPage: React.FC = () => {
             disabled={loading}
             sx={{ whiteSpace: 'nowrap' }}
           >
-            Refresh
+            {t('common.refresh') || 'Refresh'}
           </Button>
         </Box>
 
@@ -339,7 +341,7 @@ const OrdersPage: React.FC = () => {
               <Grid item xs={12} sm={6} md={3}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
-                    label="Start Date"
+                    label={t('common.startDate') || 'Start Date'}
                     value={startDate}
                     onChange={(newValue) => setStartDate(newValue)}
                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
@@ -350,7 +352,7 @@ const OrdersPage: React.FC = () => {
               <Grid item xs={12} sm={6} md={3}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
-                    label="End Date"
+                    label={t('common.endDate') || 'End Date'}
                     value={endDate}
                     onChange={(newValue) => setEndDate(newValue)}
                     slotProps={{ textField: { size: 'small', fullWidth: true } }}
@@ -360,31 +362,31 @@ const OrdersPage: React.FC = () => {
 
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size="small">
-                  <InputLabel>Status</InputLabel>
+                  <InputLabel>{t('orders.status') || 'Status'}</InputLabel>
                   <Select
                     value={statusFilter}
-                    label="Status"
+                    label={t('orders.status') || 'Status'}
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
-                    <MenuItem value="all">All Statuses</MenuItem>
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                    <MenuItem value="canceled">Canceled</MenuItem>
+                    <MenuItem value="all">{t('orders.allStatuses') || 'All Statuses'}</MenuItem>
+                    <MenuItem value="pending">{t('orders.pending') || 'Pending'}</MenuItem>
+                    <MenuItem value="completed">{t('orders.completed') || 'Completed'}</MenuItem>
+                    <MenuItem value="canceled">{t('orders.canceled') || 'Canceled'}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
 
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth size="small">
-                  <InputLabel>Location</InputLabel>
+                  <InputLabel>{t('orders.location') || 'Location'}</InputLabel>
                   <Select
                     value={locationFilter}
-                    label="Location"
+                    label={t('orders.location') || 'Location'}
                     onChange={(e) => setLocationFilter(e.target.value)}
                   >
                     {locations.map((location) => (
                       <MenuItem key={location} value={location}>
-                        {location === 'all' ? 'All Locations' : location}
+                        {location === 'all' ? t('orders.allLocations') || 'All Locations' : location}
                       </MenuItem>
                     ))}
                   </Select>
@@ -397,7 +399,7 @@ const OrdersPage: React.FC = () => {
                   onClick={handleClearFilters}
                   fullWidth
                 >
-                  Clear Filters
+                  {t('common.clearFilters') || 'Clear Filters'}
                 </Button>
               </Grid>
             </Grid>
@@ -443,7 +445,7 @@ const OrdersPage: React.FC = () => {
               ) : filteredOrders.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={headCells.length + 1} align="center">
-                    No orders found
+                    {t('orders.noOrdersFound') || 'No orders found'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -464,7 +466,7 @@ const OrdersPage: React.FC = () => {
                         <TableCell>{order.id}</TableCell>
                         <TableCell>{order.customerName}</TableCell>
                         <TableCell>
-                          {new Date(order.orderDate).toLocaleDateString()}
+                          {new Date(order.orderDate).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')}
                         </TableCell>
                         <TableCell align="right">
                           {formatCurrency(order.totalAmount, language)}
@@ -497,11 +499,11 @@ const OrdersPage: React.FC = () => {
                               <Table size="small" aria-label="order items">
                                 <TableHead>
                                   <TableRow>
-                                    <TableCell>Item</TableCell>
-                                    <TableCell>Service Type</TableCell>
-                                    <TableCell align="right">Price</TableCell>
-                                    <TableCell align="right">Quantity</TableCell>
-                                    <TableCell align="right">Total</TableCell>
+                                    <TableCell>{t('orders.item') || 'Item'}</TableCell>
+                                    <TableCell>{t('orders.serviceType') || 'Service Type'}</TableCell>
+                                    <TableCell align="right">{t('orders.price') || 'Price'}</TableCell>
+                                    <TableCell align="right">{t('orders.quantity') || 'Quantity'}</TableCell>
+                                    <TableCell align="right">{t('orders.total') || 'Total'}</TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -521,7 +523,7 @@ const OrdersPage: React.FC = () => {
                                   <TableRow>
                                     <TableCell colSpan={3} />
                                     <TableCell align="right">
-                                      <strong>Total:</strong>
+                                      <strong>{t('orders.total') || 'Total'}:</strong>
                                     </TableCell>
                                     <TableCell align="right">
                                       <strong>{formatCurrency(order.totalAmount, language)}</strong>

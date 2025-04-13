@@ -77,7 +77,7 @@ const HeatMap: React.FC<HeatMapProps> = ({
                   fontSize: '0.75rem'
                 }}
               >
-                {yLabels[index]}
+                {t(yLabels[index]) || yLabels[index]}
               </Box>
             ))}
           </Box>
@@ -96,7 +96,7 @@ const HeatMap: React.FC<HeatMapProps> = ({
                     fontSize: '0.75rem'
                   }}
                 >
-                  {xLabels[index]}
+                  {t(xLabels[index]) || xLabels[index]}
                 </Box>
               ))}
             </Box>
