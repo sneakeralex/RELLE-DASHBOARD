@@ -1,0 +1,65 @@
+cd /Users/yhan/workspace/relle/beauty-chain-dashboard && mysql -u root -p relle_mall_release < service_order_mock_data.sql
+cd /Users/yhan/workspace/relle/beauty-chain-dashboard && mysql -u root -p relle_mall_release < mock_data.sql
+cd /Users/yhan/workspace/relle/beauty-chain-dashboard && mysql -u root -e "SELECT COUNT(*) FROM relle_mall_release.app_customer_info;"
+
+USE relle_mall_release;
+
+-- 查询一个月内有订单的天数超过4天的用户数量
+-- 使用子查询代替WITH语法，以兼容旧版MySQL
+SELECT 
+    COUNT(DISTINCT unionid) as user_count
+FROM (
+    SELECT 
+        unionid,
+        order_year,
+        order_month,
+        COUNT(DISTINCT order_date) as days_with_orders
+    FROM (
+        SELECT 
+            unionid,
+            DATE(create_time) as order_date,
+            MONTH(create_time) as order_month,
+            YEAR(create_time) as order_year
+        FROM 
+            app_service_order
+        WHERE 
+            deleted = 0
+    ) as user_orders
+    GROUP BY 
+        unionid, order_year, order_month
+    HAVING 
+        days_with_orders >= 4
+) as user_monthly_order_counts;
+
+
+
+
+USE relle_mall_release;
+
+-- 开始事务
+START TRANSACTION;
+
+-- 创建临时表存储要保留的记录的ID
+CREATE TEMPORARY TABLE temp_keep_ids AS
+SELECT id FROM app_service_order
+ORDER BY id
+LIMIT 39391;
+
+-- 获取将被删除的记录数量（用于确认）
+SELECT COUNT(*) AS records_to_delete FROM app_service_order
+WHERE id NOT IN (SELECT id FROM temp_keep_ids);
+
+-- 删除不在临时表中的记录
+DELETE FROM app_service_order
+WHERE id NOT IN (SELECT id FROM temp_keep_ids);
+
+-- 验证剩余记录数量
+SELECT COUNT(*) AS remaining_records FROM app_service_order;
+
+-- 如果一切正常，提交事务；否则可以回滚
+-- COMMIT;
+-- 或者
+-- ROLLBACK;
+
+-- 删除临时表
+DROP TEMPORARY TABLE IF EXISTS temp_keep_ids;
